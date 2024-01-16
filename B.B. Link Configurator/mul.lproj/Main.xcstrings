@@ -1,0 +1,125 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "0wd-Uc-DEI.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Peripheral Label\"; ObjectID = \"0wd-Uc-DEI\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Peripheral Label"
+          }
+        }
+      }
+    },
+    "0wW-qX-zLz.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"RSSI\"; ObjectID = \"0wW-qX-zLz\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "RSSI"
+          }
+        }
+      }
+    },
+    "7Y7-Dq-kXK.accessibilityLabel" : {
+      "comment" : "Class = \"UILabel\"; accessibilityLabel = \"Not Connected\"; ObjectID = \"7Y7-Dq-kXK\";",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Connected"
+          }
+        }
+      }
+    },
+    "7Y7-Dq-kXK.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Unknown\"; ObjectID = \"7Y7-Dq-kXK\";",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown"
+          }
+        }
+      }
+    },
+    "dSc-BU-aIp.title" : {
+      "comment" : "Class = \"UITableViewController\"; title = \"Configure\"; ObjectID = \"dSc-BU-aIp\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Configure"
+          }
+        }
+      }
+    },
+    "HzL-ys-SbA.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"00:00:00:00:00:00\"; ObjectID = \"HzL-ys-SbA\";",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "00:00:00:00:00:00"
+          }
+        }
+      }
+    },
+    "nnp-8d-jt4.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Version 1.0.0 (0)\"; ObjectID = \"nnp-8d-jt4\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Version 1.0.0 (0)"
+          }
+        }
+      }
+    },
+    "uuT-so-XIa.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Firmware Version\"; ObjectID = \"uuT-so-XIa\";",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware Version"
+          }
+        }
+      }
+    },
+    "w25-yy-fKD.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Adapter Config\"; ObjectID = \"w25-yy-fKD\";",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nearby Adapters"
+          }
+        }
+      }
+    },
+    "zqY-0j-dLU.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Configure\"; ObjectID = \"zqY-0j-dLU\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Configure"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
