@@ -10,6 +10,12 @@ import UIKit
 import CoreBluetooth
 import Eureka
 
+struct BTDevice {
+    var address : ESPBDAddress?
+    var name : String
+}
+extension BTDevice: Hashable, Equatable {}
+
 class TncConfigMenuViewController : FormViewController {
     
     static let tncFirmwareVersionNotification = NSNotification.Name(rawValue: "tncFirmwareVersion")
@@ -28,7 +34,7 @@ class TncConfigMenuViewController : FormViewController {
     var capabilities : Capabilities?
     
     // Bluetooth Classic devices found
-    var devicesFound : [String : ESPBDAddress] = [:]
+    var devicesFound : [ESPBDAddress:BTDevice] = [:]
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -38,47 +44,62 @@ class TncConfigMenuViewController : FormViewController {
         super.viewDidLoad()
         
         form +++ Section()
-            <<< LabelRow(){ row in
+            <<< LabelRow() { row in
                 row.title = "Adapter Name"
                 row.value = peripheral?.name!
             }
-            <<< LabelRow(){ row in
+            <<< LabelRow() { row in
                 row.tag = "firmwareVersionRowTag"
                 row.title = "Firmware Version"
                 row.value = firmwareVersion
             }
         +++ Section(footer: "Make sure your radio is discoverable. Menu > Bluetooth > Pairing Mode")
-            <<< PushRow<String>() {row in
+        <<< PushRow<BTDevice>() {row in
                 row.tag = "pairedRadioTag"
                 row.title = "Paired Radio"
-                row.selectorTitle = "Select a Radio"
+                row.selectorTitle = "Discovering Nearby Devices..."
                 row.options = []
-                row.presentationMode = .show(controllerProvider: ControllerProvider.callback {
-                    return  DynamicSelectorViewController()
-                }, onDismiss: {vc in
-                    print("onDismiss DynamicSelectorViewController")
-                    NotificationCenter.default.post(
-                        name: BLECentralViewController.bleDataSendNotification,
-                        object: KissPacketEncoder.StopScan())
-                    print("sent StopScan to TNC")
-                    _ = vc.navigationController?.popViewController(animated: true)
-                })
+                
+                row.optionsProvider = .lazy({ (form, completion) in
+                    let activityView = UIActivityIndicatorView(style: .medium)
+                    form.tableView.backgroundView = activityView
+                     activityView.startAnimating()
+                     DispatchQueue.main.asyncAfter(deadline: .now() + 10, execute: {
+                         form.tableView.backgroundView = nil
+                         let options = Array(self.devicesFound.values)
+                         completion(options)
+                     })
+                 })                
             }.onChange { row in
-                print("pairedRadio: \(row.value ?? "None")")
-                if let address = self.devicesFound[row.value ?? ""] {
+                print("pairedRadio: \(row.value?.name ?? "None")")
+                if let address = row.value?.address {
                     print("Address:", address.stringRepresentation)
                     NotificationCenter.default.post(
                         name: BLECentralViewController.bleDataSendNotification,
                         object: KissPacketEncoder.PairWithDevice(address: address))
                     print("sent PairWithDevice to TNC")
                 }
-            }.onPresent { from, to in
-                NotificationCenter.default.post(
-                    name: BLECentralViewController.bleDataSendNotification,
-                    object: KissPacketEncoder.StartScan())
-                print("sent StartScan to TNC")
-            }
-        +++ Section("Advanced")
+                }.onPresent { from, to in
+                    self.devicesFound.removeAll()
+                    NotificationCenter.default.post(
+                        name: BLECentralViewController.bleDataSendNotification,
+                        object: KissPacketEncoder.StartScan())
+                    print("sent StartScan to TNC")
+                    to.selectableRowCellUpdate = { (cell, row) in
+                        cell.textLabel?.text = row.selectableValue?.name
+                    }
+                    to.onDismissCallback = { vc in
+                        NotificationCenter.default.post(
+                            name: BLECentralViewController.bleDataSendNotification,
+                            object: KissPacketEncoder.StopScan())
+                        print("sent StopScan to TNC")
+                        _ = vc.navigationController?.popViewController(animated: true)
+                    }
+                }.cellUpdate {cell,row in
+                    cell.detailTextLabel?.text = row.value?.name
+                }
+            
+            +++ Section("Advanced")
         <<< SwitchRow() {row in
             row.tag = "useRigCtrlTag"
             row.title = "Control Frequency"
@@ -179,13 +200,6 @@ class TncConfigMenuViewController : FormViewController {
         return capabilities?.contains(.CAP_RIG_CTRL) ?? true
     }
     
-    func findPresentedDynamicSelectorViewController() -> DynamicSelectorViewController? {
-        if let navigation = self.navigationController, let dynamicSelectorVC = navigation.topViewController as? DynamicSelectorViewController {
-            return dynamicSelectorVC
-        }
-        return nil
-    }
-    
     func postPacket(packet: KissPacketDecoder)
     {
         if let hardware = packet.getHardwareType() {
@@ -220,17 +234,7 @@ class TncConfigMenuViewController : FormViewController {
                     let name = parsed.name
                     print("Address:", address.stringRepresentation)
                     print("Name:", name)
-                    devicesFound.updateValue(address, forKey: name)
-                    
-                    if let dynamicSelectorVC = findPresentedDynamicSelectorViewController() {
-                        print("Updating via dynamic selector")
-                        dynamicSelectorVC.updateOptions(devicesFound.keys.sorted())
-                    } else {
-                        print("Updating in list")
-                        let pairedRadioRow: PushRow<String>? = form.rowBy(tag: "pairedRadioTag")
-                        pairedRadioRow?.options = devicesFound.keys.sorted()
-                        pairedRadioRow?.reload()
-                    }
+                    devicesFound.updateValue(BTDevice(address: address, name: name), forKey: address)
                 }
                 else
                 {
@@ -256,21 +260,19 @@ class TncConfigMenuViewController : FormViewController {
                     let name = parsed.name
                     print("Address:", address.stringRepresentation)
                     print("Name:", name)
-                    devicesFound.updateValue(address, forKey: name)
-                    let pairedRadioRow: PushRow<String>? = form.rowBy(tag: "pairedRadioTag")
-                    pairedRadioRow?.options = devicesFound.keys.sorted()
-                    pairedRadioRow?.value = name
-                    tableView.reloadData()
+                    let device = BTDevice(address: address, name: name)
+                    devicesFound.updateValue(device, forKey: address)
+                    let pairedRadioRow: PushRow<BTDevice>? = form.rowBy(tag: "pairedRadioTag")
+                    pairedRadioRow?.value = device
                 }
                 else
                 {
                     print("No previously paired device found")
                     devicesFound.removeAll()
-                    let pairedRadioRow: PushRow<String>? = form.rowBy(tag: "pairedRadioTag")
-                    pairedRadioRow?.options = []
+                    let pairedRadioRow: PushRow<BTDevice>? = form.rowBy(tag: "pairedRadioTag")
                     pairedRadioRow?.value = nil
-                    tableView.reloadData()
                 }
+                tableView.reloadData()
                 break
                 
             }
