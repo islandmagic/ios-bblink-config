@@ -35,6 +35,7 @@ class TncConfigMenuViewController : FormViewController {
     
     // Bluetooth Classic devices found
     var devicesFound : [ESPBDAddress:BTDevice] = [:]
+    var pairedDevice : BTDevice?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -43,21 +44,12 @@ class TncConfigMenuViewController : FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        form +++ Section()
-            <<< LabelRow() { row in
-                row.title = "Adapter Name"
-                row.value = peripheral?.name!
-            }
-            <<< LabelRow() { row in
-                row.tag = "firmwareVersionRowTag"
-                row.title = "Firmware Version"
-                row.value = firmwareVersion
-            }
-        +++ Section(footer: "Make sure your radio is discoverable. Menu > Bluetooth > Pairing Mode")
+        form
+        +++ Section(footer: "Make sure your radio is discoverable before pairing. Menu > Bluetooth > Pairing Mode")
         <<< PushRow<BTDevice>() {row in
                 row.tag = "pairedRadioTag"
                 row.title = "Paired Radio"
-                row.selectorTitle = "Discovering Nearby Devices..."
+                row.selectorTitle = "Discovering Nearby Radios..."
                 row.options = []
                 
                 row.optionsProvider = .lazy({ (form, completion) in
@@ -66,21 +58,32 @@ class TncConfigMenuViewController : FormViewController {
                      activityView.startAnimating()
                      DispatchQueue.main.asyncAfter(deadline: .now() + 10, execute: {
                          form.tableView.backgroundView = nil
+                         NotificationCenter.default.post(
+                             name: BLECentralViewController.bleDataSendNotification,
+                             object: KissPacketEncoder.StopScan())
+                         print("sent StopScan to TNC")
                          let options = Array(self.devicesFound.values)
                          completion(options)
                      })
                  })                
-            }.onChange { row in
-                print("pairedRadio: \(row.value?.name ?? "None")")
-                if let address = row.value?.address {
-                    print("Address:", address.stringRepresentation)
-                    NotificationCenter.default.post(
-                        name: BLECentralViewController.bleDataSendNotification,
-                        object: KissPacketEncoder.PairWithDevice(address: address))
-                    print("sent PairWithDevice to TNC")
-                }
+                }.onChange { row in
+                    print("onChange paired value \(row.value?.name ?? "None")")
+                    if row.value != nil && self.pairedDevice != row.value {
+                        print("Pairing with radio: \(row.value!.name)")
+                        if let address = row.value?.address {
+                            print("Address:", address.stringRepresentation)
+                            NotificationCenter.default.post(
+                                name: BLECentralViewController.bleDataSendNotification,
+                                object: KissPacketEncoder.PairWithDevice(address: address))
+                            print("sent PairWithDevice to TNC")
+                        }
+                    }
                 }.onPresent { from, to in
                     self.devicesFound.removeAll()
+                    NotificationCenter.default.post(
+                        name: BLECentralViewController.bleDataSendNotification,
+                        object: KissPacketEncoder.ClearPairedDevice())
+
                     NotificationCenter.default.post(
                         name: BLECentralViewController.bleDataSendNotification,
                         object: KissPacketEncoder.StartScan())
@@ -99,10 +102,10 @@ class TncConfigMenuViewController : FormViewController {
                     cell.detailTextLabel?.text = row.value?.name
                 }
             
-            +++ Section("Advanced")
+        +++ Section(header: "Advanced", footer: "Allow apps to control the radio frequency and mode, or turn off for manual operation.")
         <<< SwitchRow() {row in
             row.tag = "useRigCtrlTag"
-            row.title = "Control Frequency"
+            row.title = "Allow Radio Control"
             row.value = true
         }.onChange {row in
             print("useRigCtrl \(row.value)")
@@ -110,7 +113,32 @@ class TncConfigMenuViewController : FormViewController {
                 name: BLECentralViewController.bleDataSendNotification,
                 object: KissPacketEncoder.SetRigCtrl(value: row.value ?? true))
         }
-        
+        +++ Section()
+            <<< LabelRow() { row in
+                row.title = "Adapter Name"
+                row.value = peripheral?.name!
+            }
+            <<< LabelRow() { row in
+                row.tag = "firmwareVersionRowTag"
+                row.title = "Firmware Version"
+                row.value = firmwareVersion
+            }
+        +++ Section(footer: "To pair with a new radio, turn off the one that's already paired before powering on the adapter. Or, reset the adapter to start over.")
+        <<< ButtonRow() {row in
+            row.tag = "factoryResetTag"
+            row.title = "Reset Adapter"
+        }.onCellSelection { [weak self] (cell, row) in
+            let alert = UIAlertController(title: "Reset Adapter", message: "Resetting the adapter will restore its default settings and reboot it.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK".localized, style: .default, handler: { action in
+                print("Resetting adapter")
+                NotificationCenter.default.post(
+                    name: BLECentralViewController.bleDataSendNotification,
+                    object: KissPacketEncoder.FactoryReset())
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel".localized, style: .default, handler: nil))
+            self?.present(alert, animated: true, completion: nil)
+                    }
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(self.didLoseConnection),
@@ -234,24 +262,13 @@ class TncConfigMenuViewController : FormViewController {
                     let name = parsed.name
                     print("Address:", address.stringRepresentation)
                     print("Name:", name)
-                    devicesFound.updateValue(BTDevice(address: address, name: name), forKey: address)
+                    let device = BTDevice(address: address, name: name)
+                    devicesFound.updateValue(device, forKey: address)
                 }
                 else
                 {
                     print("Invalid device info")
                 }
-                break
-            case .START_SCAN:
-                print("Start scan")
-                break
-            case .STOP_SCAN:
-                print("Stop scan")
-                break
-            case .PAIR_WITH_DEVICE:
-                print("Pair with device")
-                break
-            case .CLEAR_PAIRED_DEVICE:
-                print("Clear paired device")
                 break
             case .GET_PAIRED_DEVICE:
                 print("Get paired device")
@@ -260,15 +277,16 @@ class TncConfigMenuViewController : FormViewController {
                     let name = parsed.name
                     print("Address:", address.stringRepresentation)
                     print("Name:", name)
-                    let device = BTDevice(address: address, name: name)
-                    devicesFound.updateValue(device, forKey: address)
+                    pairedDevice = BTDevice(address: address, name: name)
+                    devicesFound.updateValue(pairedDevice!, forKey: address)
                     let pairedRadioRow: PushRow<BTDevice>? = form.rowBy(tag: "pairedRadioTag")
-                    pairedRadioRow?.value = device
+                    pairedRadioRow?.value = pairedDevice
                 }
                 else
                 {
                     print("No previously paired device found")
                     devicesFound.removeAll()
+                    pairedDevice = nil
                     let pairedRadioRow: PushRow<BTDevice>? = form.rowBy(tag: "pairedRadioTag")
                     pairedRadioRow?.value = nil
                 }

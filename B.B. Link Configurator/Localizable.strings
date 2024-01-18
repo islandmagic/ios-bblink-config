@@ -10,7 +10,7 @@
 "RSSI:" = "RSSI:";
 
 "ConnectAlertTitle" = "Connect To Adapter";
-"ConnectAlertMessage" = "Connecting to an adapter with an active connection can prevent it from receiving or transmitting packets.\n\nAre you sure you wish to continue?";
+"ConnectAlertMessage" = "Attempting to connect to an adapter that's already in use may block it from sending or receiving packets.\n\nDo you want to proceed?";
 
 "Connect" = "Connect";
 "Cancel" = "Cancel";

@@ -38,11 +38,7 @@ class KissPacketDecoder
         case API_VERSION = 123        // API 2.0
         case CAPABILITIES = 126
 
-        case START_SCAN = 0xEC
-        case STOP_SCAN = 0xED
         case FOUND_DEVICE = 0xEE
-        case PAIR_WITH_DEVICE = 0xEF
-        case CLEAR_PAIRED_DEVICE = 0xF0
         case GET_PAIRED_DEVICE = 0xF1
     }
     
@@ -133,6 +129,8 @@ class KissPacketEncoder {
         case CLEAR_PAIRED_DEVICE = 0xF0
         case GET_PAIRED_DEVICE = 0xF1
         case SET_RIG_CTRL = 0xF2
+        case FACTORY_RESET = 0xF3
+
     }
     
     let packetType : PacketType
@@ -223,5 +221,15 @@ class KissPacketEncoder {
     static func GetCapabilities() -> Data {
         return SlipProtocolEncoder.encode(
             value: KissPacketEncoder(hardwareType: .CAPABILITIES).encode())
+    }
+
+    static func ClearPairedDevice() -> Data {
+        return SlipProtocolEncoder.encode(
+            value: KissPacketEncoder(hardwareType: .CLEAR_PAIRED_DEVICE).encode())
+    }
+
+    static func FactoryReset() -> Data {
+        return SlipProtocolEncoder.encode(
+            value: KissPacketEncoder(hardwareType: .FACTORY_RESET).encode())
     }
 }
