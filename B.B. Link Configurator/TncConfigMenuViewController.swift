@@ -5,12 +5,15 @@
 //  Created by Rob Riggs on 12/29/18.
 //  Copyright © 2018 Mobilinkd LLC. All rights reserved.
 //
+//  Adapted for B.B. Link adapter 01/18/24
+//
 
 import UIKit
 import CoreBluetooth
 import Eureka
 
 struct BTDevice {
+    var connected : Bool?
     var address : ESPBDAddress?
     var name : String
 }
@@ -18,9 +21,7 @@ extension BTDevice: Hashable, Equatable {}
 
 class TncConfigMenuViewController : FormViewController {
     
-    static let tncFirmwareVersionNotification = NSNotification.Name(rawValue: "tncFirmwareVersion")
     static let tncApiVersionNotification = NSNotification.Name(rawValue: "tncApiVersion")
-    static let tncCapabilitiesNotification = NSNotification.Name(rawValue: "tncCapabilities")
     
     var mainViewController : BLECentralViewController?
     var peripheralManager: CBPeripheralManager?
@@ -32,6 +33,10 @@ class TncConfigMenuViewController : FormViewController {
     // TNC Information
     var firmwareVersion : String?
     var capabilities : Capabilities?
+    var apiVersion : UInt16?
+    
+    // Last known api version.
+    let knownApiVersion = 0x0100
     
     // Bluetooth Classic devices found
     var devicesFound : [ESPBDAddress:BTDevice] = [:]
@@ -45,13 +50,15 @@ class TncConfigMenuViewController : FormViewController {
         super.viewDidLoad()
         
         form
-        +++ Section(footer: "Make sure your radio is discoverable before pairing. Menu > Bluetooth > Pairing Mode")
+        +++ Section(footer: "Before pairing, set your radio to be discoverable by selecting Menu > Bluetooth > Pairing Mode. To pair with a different radio, turn off the currently paired one before switching on the adapter, or reset the adapter to start over.")
         <<< PushRow<BTDevice>() {row in
                 row.tag = "pairedRadioTag"
                 row.title = "Paired Radio"
                 row.selectorTitle = "Discovering Nearby Radios..."
                 row.options = []
-                
+                row.disabled = Condition.function(["pairedRadioTag"], { form in
+                    return self.pairedDevice != nil && self.pairedDevice?.connected == true
+                })
                 row.optionsProvider = .lazy({ (form, completion) in
                     let activityView = UIActivityIndicatorView(style: .medium)
                     form.tableView.backgroundView = activityView
@@ -123,7 +130,7 @@ class TncConfigMenuViewController : FormViewController {
                 row.title = "Firmware Version"
                 row.value = firmwareVersion
             }
-        +++ Section(footer: "To pair with a new radio, turn off the one that's already paired before powering on the adapter. Or, reset the adapter to start over.")
+        +++ Section()
         <<< ButtonRow() {row in
             row.tag = "factoryResetTag"
             row.title = "Reset Adapter"
@@ -163,6 +170,16 @@ class TncConfigMenuViewController : FormViewController {
             name: BLECentralViewController.bleDataReceiveNotification,
             object: nil)
 
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.checkApiVersion),
+            name: TncConfigMenuViewController.tncApiVersionNotification,
+            object: nil)
+        
+        NotificationCenter.default.post(
+            name: BLECentralViewController.bleDataSendNotification,
+            object: KissPacketEncoder.GetAPIVersion())
+
         NotificationCenter.default.post(
             name: BLECentralViewController.bleDataSendNotification,
             object: KissPacketEncoder.GetCapabilities())
@@ -192,10 +209,8 @@ class TncConfigMenuViewController : FormViewController {
     @objc func willResignActive(notification: NSNotification)
     {
         print("TncConfigMenuViewController.willResignActive")
-        
-        if self.isBeingPresented {
-            disconnectBle()
-        }
+        print("Disconnecting from BLE")
+        disconnectBle()
     }
     
     @objc func didBecomeActive(notification: NSNotification)
@@ -237,11 +252,10 @@ class TncConfigMenuViewController : FormViewController {
                 let firmwareVersionRow: LabelRow? = form.rowBy(tag: "firmwareVersionRowTag")
                 firmwareVersionRow?.value = packet.asString()
                 tableView.reloadData()
-                NotificationCenter.default.post(
-                    name: TncConfigMenuViewController.tncFirmwareVersionNotification,
-                    object: packet)
                 break
             case .API_VERSION:
+                print("Received api version: ", packet.asUInt16())
+                apiVersion = packet.asUInt16()
                 NotificationCenter.default.post(
                     name: TncConfigMenuViewController.tncApiVersionNotification,
                     object: packet)
@@ -251,9 +265,6 @@ class TncConfigMenuViewController : FormViewController {
                 let useRigCtrlRow: SwitchRow? = form.rowBy(tag: "useRigCtrlTag")
                 useRigCtrlRow?.value = hasRigCtrl()
                 useRigCtrlRow?.reload()
-                NotificationCenter.default.post(
-                    name: TncConfigMenuViewController.tncCapabilitiesNotification,
-                    object: packet)
                 break
             case .FOUND_DEVICE:
                 print("Found device")
@@ -273,11 +284,13 @@ class TncConfigMenuViewController : FormViewController {
             case .GET_PAIRED_DEVICE:
                 print("Get paired device")
                 if let parsed = parseBluetoothPacket(packet: packet.data) {
+                    let connected = parsed.connected
                     let address = parsed.address
                     let name = parsed.name
+                    print("Connected:", connected)
                     print("Address:", address.stringRepresentation)
                     print("Name:", name)
-                    pairedDevice = BTDevice(address: address, name: name)
+                    pairedDevice = BTDevice(connected: connected, address: address, name: name)
                     devicesFound.updateValue(pairedDevice!, forKey: address)
                     let pairedRadioRow: PushRow<BTDevice>? = form.rowBy(tag: "pairedRadioTag")
                     pairedRadioRow?.value = pairedDevice
@@ -318,28 +331,41 @@ class TncConfigMenuViewController : FormViewController {
         }
     }
     
-    func parseBluetoothPacket(packet: Data) -> (address: ESPBDAddress, name: String)? {
+    @objc func checkApiVersion(notification: NSNotification)
+    {
+        print("Got apiversion")
+        if apiVersion != nil && apiVersion! > knownApiVersion {
+            let alert = UIAlertController(title: "New Version Detected", message: "The adapter reported a more recent version than anticipated by the configurator app. For optimal compatibility, please update the configurator app.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK".localized, style: .default, handler: { action in }))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func parseBluetoothPacket(packet: Data) -> (connected: Bool, address: ESPBDAddress, name: String)? {
         // Ensure the packet has at least 6 bytes for the address
-        guard packet.count > 6 else {
+        guard packet.count > 7 else {
             print("Packet is too short to contain a valid address and name.")
             return nil
         }
         
-        // Extract the first 6 bytes as the address
-        let addressData = packet.subdata(in: 0..<6)
+        // Extract the first byte as connection status
+        let connected = packet[0] == 0x01
+        
+        // Extract the next 6 bytes as the address
+        let addressData = packet.subdata(in: 1..<7)
         guard let address = ESPBDAddress(address: addressData) else {
             print("The address part of the packet is not valid.")
             return nil
         }
         
         // Extract the remaining bytes as the name
-        let nameData = packet.subdata(in: 6..<packet.count)
+        let nameData = packet.subdata(in: 7..<packet.count)
         guard let name = String(data: nameData, encoding: .utf8) else {
             print("Name data could not be decoded as a UTF-8 string.")
             return nil
         }
         
         // Return the parsed address and name
-        return (address, name)
+        return (connected, address, name)
     }
 }
