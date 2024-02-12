@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/gauberger/dev/islandmagic/ios-bblink-config/B.B. Link Configurator.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>

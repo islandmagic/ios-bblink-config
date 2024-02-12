@@ -52,6 +52,6 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-	</array>
+	</array>	
 </dict>
 </plist>
