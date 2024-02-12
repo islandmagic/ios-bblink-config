@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		046E6D252B57344A0033FBBF /* Eureka.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04CA88282B57331300E08A93 /* Eureka.xcframework */; };
-		046E6D262B57344A0033FBBF /* Eureka.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 04CA88282B57331300E08A93 /* Eureka.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		042885132B7460A700105FCB /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 042885122B7460A700105FCB /* JGProgressHUD */; };
+		042885162B74611200105FCB /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = 042885152B74611200105FCB /* Eureka */; };
+		0445DEAA2B74A4DB00E7D821 /* FirmwareUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0445DEA92B74A4DB00E7D821 /* FirmwareUpdater.swift */; };
 		048C20152B54D1650053BC7E /* ESPBDAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048C20142B54D1650053BC7E /* ESPBDAddress.swift */; };
+		04B5224B2B796F5700D87B5A /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04B5224A2B796F5700D87B5A /* Settings.bundle */; };
 		D44EE5D521D9848100D0FC33 /* SlipProtocolDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44EE5D421D9848100D0FC33 /* SlipProtocolDecoder.swift */; };
 		D44EE5D721D98B2F00D0FC33 /* KissPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44EE5D621D98B2F00D0FC33 /* KissPacket.swift */; };
 		D44EE5DB21D9CA6200D0FC33 /* SlipProtocolEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44EE5DA21D9CA6200D0FC33 /* SlipProtocolEncoder.swift */; };
@@ -31,7 +33,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				046E6D262B57344A0033FBBF /* Eureka.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -39,9 +40,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0445DEA92B74A4DB00E7D821 /* FirmwareUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirmwareUpdater.swift; sourceTree = "<group>"; };
 		048C20142B54D1650053BC7E /* ESPBDAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPBDAddress.swift; sourceTree = "<group>"; };
 		048C201A2B565A770053BC7E /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/Main.xcstrings; sourceTree = "<group>"; };
-		04CA88282B57331300E08A93 /* Eureka.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Eureka.xcframework; path = Carthage/Build/Eureka.xcframework; sourceTree = "<group>"; };
+		04B5224A2B796F5700D87B5A /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = "B.B. Link Configurator/Settings.bundle"; sourceTree = "<group>"; };
 		D44EE5D421D9848100D0FC33 /* SlipProtocolDecoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlipProtocolDecoder.swift; sourceTree = "<group>"; };
 		D44EE5D621D98B2F00D0FC33 /* KissPacket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KissPacket.swift; sourceTree = "<group>"; };
 		D44EE5DA21D9CA6200D0FC33 /* SlipProtocolEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlipProtocolEncoder.swift; sourceTree = "<group>"; };
@@ -63,27 +65,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				046E6D252B57344A0033FBBF /* Eureka.xcframework in Frameworks */,
+				042885132B7460A700105FCB /* JGProgressHUD in Frameworks */,
+				042885162B74611200105FCB /* Eureka in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		64776163679FF1DF85687C69 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				04CA88282B57331300E08A93 /* Eureka.xcframework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		D5B24DCF1DEE393B00D33B5A = {
 			isa = PBXGroup;
 			children = (
+				04B5224A2B796F5700D87B5A /* Settings.bundle */,
 				D5B24DDA1DEE393B00D33B5A /* B.B. Link Configurator */,
 				D5B24DD91DEE393B00D33B5A /* Products */,
-				64776163679FF1DF85687C69 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,6 +93,7 @@
 		D5B24DDA1DEE393B00D33B5A /* B.B. Link Configurator */ = {
 			isa = PBXGroup;
 			children = (
+				0445DEA92B74A4DB00E7D821 /* FirmwareUpdater.swift */,
 				D5B24DDB1DEE393B00D33B5A /* AppDelegate.swift */,
 				D5B24DED1DEE399800D33B5A /* BLECentralViewController.swift */,
 				D5B24DEF1DEF153A00D33B5A /* PeripheralTableViewCell.swift */,
@@ -135,6 +131,10 @@
 			dependencies = (
 			);
 			name = "B.B. Link Configurator";
+			packageProductDependencies = (
+				042885122B7460A700105FCB /* JGProgressHUD */,
+				042885152B74611200105FCB /* Eureka */,
+			);
 			productName = "Basic Chat";
 			productReference = D5B24DD81DEE393B00D33B5A /* B.B. Link Configurator.app */;
 			productType = "com.apple.product-type.application";
@@ -167,6 +167,10 @@
 				Base,
 			);
 			mainGroup = D5B24DCF1DEE393B00D33B5A;
+			packageReferences = (
+				042885112B7460A700105FCB /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
+				042885142B74611200105FCB /* XCRemoteSwiftPackageReference "Eureka" */,
+			);
 			productRefGroup = D5B24DD91DEE393B00D33B5A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -183,6 +187,7 @@
 			files = (
 				D5B24DE61DEE393B00D33B5A /* LaunchScreen.storyboard in Resources */,
 				D480B12824033B8E008FDC62 /* Localizable.strings in Resources */,
+				04B5224B2B796F5700D87B5A /* Settings.bundle in Resources */,
 				D5B24DE31DEE393B00D33B5A /* Assets.xcassets in Resources */,
 				D5B24DE11DEE393B00D33B5A /* Main.storyboard in Resources */,
 			);
@@ -236,6 +241,7 @@
 				D44EE5DB21D9CA6200D0FC33 /* SlipProtocolEncoder.swift in Sources */,
 				D5B24DEE1DEE399800D33B5A /* BLECentralViewController.swift in Sources */,
 				D44EE5D521D9848100D0FC33 /* SlipProtocolDecoder.swift in Sources */,
+				0445DEAA2B74A4DB00E7D821 /* FirmwareUpdater.swift in Sources */,
 				048C20152B54D1650053BC7E /* ESPBDAddress.swift in Sources */,
 				D5B24DDC1DEE393B00D33B5A /* AppDelegate.swift in Sources */,
 				D5B24DF11DEF153A00D33B5A /* PeripheralTableViewCell.swift in Sources */,
@@ -391,7 +397,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7C6UBLMW45;
 				INFOPLIST_FILE = "$(SRCROOT)/$(PRODUCT_NAME)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "B.B. Link Configurator";
@@ -401,7 +407,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.islandmagic.bblink-config";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -414,7 +420,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7C6UBLMW45;
 				INFOPLIST_FILE = "$(SRCROOT)/$(PRODUCT_NAME)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "B.B. Link Configurator";
@@ -424,7 +430,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.islandmagic.bblink-config";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -455,6 +461,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		042885112B7460A700105FCB /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JonasGessner/JGProgressHUD.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+		042885142B74611200105FCB /* XCRemoteSwiftPackageReference "Eureka" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/xmartlabs/Eureka.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		042885122B7460A700105FCB /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 042885112B7460A700105FCB /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
+		};
+		042885152B74611200105FCB /* Eureka */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 042885142B74611200105FCB /* XCRemoteSwiftPackageReference "Eureka" */;
+			productName = Eureka;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D5B24DD01DEE393B00D33B5A /* Project object */;
 }
