@@ -59,7 +59,7 @@ class TncConfigMenuViewController: FormViewController {
     form
       +++ Section(
         footer:
-          "Before pairing, set your radio to be discoverable by selecting Menu > Bluetooth > Pairing Mode. To pair with a different radio, turn off the currently paired one before switching on the adapter, or reset the adapter to start over."
+          "Before pairing, set your radio to be discoverable by selecting Menu > Bluetooth > Pairing Mode. To pair with a different radio, turn off the currently paired one and reset the adapter to start over."
       )
       <<< PushRow<BTDevice> { row in
         row.tag = "pairedRadioTag"
@@ -78,6 +78,7 @@ class TncConfigMenuViewController: FormViewController {
           DispatchQueue.main.asyncAfter(
             deadline: .now() + 10,
             execute: { [weak self] in
+              guard self != nil else { return }
               form.tableView.backgroundView = nil
               NotificationCenter.default.post(
                 name: .bleDataSendRequest,
