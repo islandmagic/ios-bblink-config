@@ -56,48 +56,76 @@ class TncConfigMenuViewController: FormViewController {
     print("TncConfigMenuViewController.viewDidLoad")
     super.viewDidLoad()
 
+    var optionsTimer: Timer?
+    
     form
       +++ Section(
         footer:
-          "Before pairing, set your radio to be discoverable by selecting Menu > Bluetooth > Pairing Mode. To pair with a different radio, turn off the currently paired one and reset the adapter to start over."
+          "Before pairing, make your radio discoverable by selecting Menu > Configuration > Bluetooth > Pairing Mode (934). To pair with a different radio, reset the adapter to start over."
       )
       <<< PushRow<BTDevice> { row in
         row.tag = "pairedRadioTag"
-        row.title = "Paired Radio"
+        row.title = self.pairedDevice == nil ? "Pair Radio" : "Paired Radio"
         row.selectorTitle = "Discovering Nearby Radios..."
         row.options = []
         row.disabled = Condition.function(
           ["pairedRadioTag"],
           { [weak self] form in
-            return self?.pairedDevice != nil && self?.pairedDevice?.connected == true
+              return self?.pairedDevice != nil || row.value != nil
           })
         row.optionsProvider = .lazy({ [weak self] (form, completion) in
           let activityView = UIActivityIndicatorView(style: .medium)
           form.tableView.backgroundView = activityView
           activityView.startAnimating()
-          DispatchQueue.main.asyncAfter(
-            deadline: .now() + 10,
-            execute: { [weak self] in
-              guard self != nil else { return }
-              form.tableView.backgroundView = nil
+
+          optionsTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            if self.devicesFound.isEmpty {
+              return
+            }
+              optionsTimer?.invalidate()
+
               NotificationCenter.default.post(
                 name: .bleDataSendRequest,
                 object: KissPacketEncoder.StopScan())
               print("sent StopScan to TNC")
-              let options = Array(self!.devicesFound.values)
+              
+              DispatchQueue.main.async {
+              form.tableView.backgroundView = nil
+              let options = Array(self.devicesFound.values)
               completion(options)
-            })
+            }
+          }
         })
       }.onChange { [weak self] row in
         print("onChange paired value \(row.value?.name ?? "None")")
+        row.title = self?.pairedDevice == nil ? "Pair Radio" : "Paired Radio"
+
         if row.value != nil && self?.pairedDevice != row.value {
           print("Pairing with radio: \(row.value!.name)")
           if let address = row.value?.address {
             print("Address:", address.stringRepresentation)
+              
+            row.title = "Paired Radio"
+
             NotificationCenter.default.post(
               name: .bleDataSendRequest,
               object: KissPacketEncoder.PairWithDevice(address: address))
             print("sent PairWithDevice to TNC")
+              
+              let alert = UIAlertController(
+              title: "Confirm Pairing",
+              message: "On the radio, press OK to confirm pairing.",
+              preferredStyle: .alert)
+              alert.addAction(
+              UIAlertAction(
+                title: "Done", style: .default,
+                handler: nil))
+              
+              DispatchQueue.main.async {
+                self?.present(alert, animated: true)
+              }
+
           }
         }
       }.onPresent { [weak self] from, to in
@@ -106,13 +134,30 @@ class TncConfigMenuViewController: FormViewController {
           name: .bleDataSendRequest,
           object: KissPacketEncoder.ClearPairedDevice())
 
-        NotificationCenter.default.post(
-          name: .bleDataSendRequest,
-          object: KissPacketEncoder.StartScan())
-        print("sent StartScan to TNC")
+
+        let alert = UIAlertController(
+        title: "Bluetooth Pairing Mode",
+        message: "Make your radio discoverable by selecting Menu > Configuration > Bluetooth > Pairing Mode (934)",
+        preferredStyle: .alert)
+        alert.addAction(
+        UIAlertAction(
+          title: "OK", style: .default,
+          handler: { action in
+              NotificationCenter.default.post(
+                name: .bleDataSendRequest,
+                object: KissPacketEncoder.StartScan())
+              print("sent StartScan to TNC")
+
+          }))
+        
+        DispatchQueue.main.async {
+          self?.present(alert, animated: true)
+        }
+          
         to.selectableRowCellUpdate = { (cell, row) in
           cell.textLabel?.text = row.selectableValue?.name
         }
+          
         to.onDismissCallback = { vc in
           NotificationCenter.default.post(
             name: .bleDataSendRequest,
