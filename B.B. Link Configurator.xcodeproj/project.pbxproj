@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		042885132B7460A700105FCB /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 042885122B7460A700105FCB /* JGProgressHUD */; };
 		042885162B74611200105FCB /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = 042885152B74611200105FCB /* Eureka */; };
+		043A103A2BBCD6C50075BD5D /* Bugsnag in Frameworks */ = {isa = PBXBuildFile; productRef = 043A10392BBCD6C50075BD5D /* Bugsnag */; };
+		043A103C2BBCD6C50075BD5D /* BugsnagNetworkRequestPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 043A103B2BBCD6C50075BD5D /* BugsnagNetworkRequestPlugin */; };
 		0445DEAA2B74A4DB00E7D821 /* FirmwareUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0445DEA92B74A4DB00E7D821 /* FirmwareUpdater.swift */; };
 		048C20152B54D1650053BC7E /* ESPBDAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048C20142B54D1650053BC7E /* ESPBDAddress.swift */; };
 		04B5224B2B796F5700D87B5A /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04B5224A2B796F5700D87B5A /* Settings.bundle */; };
@@ -65,6 +67,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				043A103C2BBCD6C50075BD5D /* BugsnagNetworkRequestPlugin in Frameworks */,
+				043A103A2BBCD6C50075BD5D /* Bugsnag in Frameworks */,
 				042885132B7460A700105FCB /* JGProgressHUD in Frameworks */,
 				042885162B74611200105FCB /* Eureka in Frameworks */,
 			);
@@ -125,6 +129,7 @@
 				D4F307CB25D09C1300440DC2 /* ShellScript */,
 				D5B24DD61DEE393B00D33B5A /* Resources */,
 				046E6D272B57344A0033FBBF /* Embed Frameworks */,
+				043A103D2BBCD8C30075BD5D /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -134,6 +139,8 @@
 			packageProductDependencies = (
 				042885122B7460A700105FCB /* JGProgressHUD */,
 				042885152B74611200105FCB /* Eureka */,
+				043A10392BBCD6C50075BD5D /* Bugsnag */,
+				043A103B2BBCD6C50075BD5D /* BugsnagNetworkRequestPlugin */,
 			);
 			productName = "Basic Chat";
 			productReference = D5B24DD81DEE393B00D33B5A /* B.B. Link Configurator.app */;
@@ -170,6 +177,7 @@
 			packageReferences = (
 				042885112B7460A700105FCB /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
 				042885142B74611200105FCB /* XCRemoteSwiftPackageReference "Eureka" */,
+				043A10382BBCD6C50075BD5D /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */,
 			);
 			productRefGroup = D5B24DD91DEE393B00D33B5A /* Products */;
 			projectDirPath = "";
@@ -196,6 +204,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		043A103D2BBCD8C30075BD5D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(DWARF_DSYM_FOLDER_PATH)/$(DWARF_DSYM_FILE_NAME)/Contents/Resources/DWARF/$(TARGET_NAME)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /usr/bin/ruby;
+			shellScript = "api_key = '31880cd367fdfda15269fa0debd083df'\n\nif ENV['ENABLE_USER_SCRIPT_SANDBOXING'] == 'YES'\n  count = ENV['SCRIPT_INPUT_FILE_COUNT'].to_i\n  abort 'error: dSYMs must be specified as build phase \"Input Files\" because ENABLE_USER_SCRIPT_SANDBOXING is enabled' unless count > 0\n  dsyms = []\n  for i in 0 .. count - 1\n    dsym = ENV[\"SCRIPT_INPUT_FILE_#{i}\"]\n    if File.exist? dsym\n      dsyms.append dsym\n    else\n      abort \"error: cannot read #{dsym}\" unless ENV['DEBUG_INFORMATION_FORMAT'] != 'dwarf-with-dsym'\n    end\n  end\nelse\n  dsyms = Dir[\"#{ENV['DWARF_DSYM_FOLDER_PATH']}/*/Contents/Resources/DWARF/*\"]\nend\n\ndsyms.each do |dsym|\n  Process.detach Process.spawn('/usr/bin/curl', '--http1.1',\n    '-F', \"apiKey=#{api_key}\",\n    '-F', \"dsym=@#{dsym}\",\n    '-F', \"projectRoot=#{ENV['PROJECT_DIR']}\",\n    'https://upload.bugsnag.com/'\n  )\nend\n";
+		};
 		D4909E3E25D07A86002C8C93 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -397,7 +424,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = 7C6UBLMW45;
 				INFOPLIST_FILE = "$(SRCROOT)/$(PRODUCT_NAME)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "B.B. Link Configurator";
@@ -407,7 +434,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.islandmagic.bblink-config";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -420,7 +447,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = 7C6UBLMW45;
 				INFOPLIST_FILE = "$(SRCROOT)/$(PRODUCT_NAME)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "B.B. Link Configurator";
@@ -430,7 +457,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.islandmagic.bblink-config";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -479,6 +506,14 @@
 				minimumVersion = 5.4.0;
 			};
 		};
+		043A10382BBCD6C50075BD5D /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bugsnag/bugsnag-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.28.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -491,6 +526,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 042885142B74611200105FCB /* XCRemoteSwiftPackageReference "Eureka" */;
 			productName = Eureka;
+		};
+		043A10392BBCD6C50075BD5D /* Bugsnag */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 043A10382BBCD6C50075BD5D /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */;
+			productName = Bugsnag;
+		};
+		043A103B2BBCD6C50075BD5D /* BugsnagNetworkRequestPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 043A10382BBCD6C50075BD5D /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */;
+			productName = BugsnagNetworkRequestPlugin;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
