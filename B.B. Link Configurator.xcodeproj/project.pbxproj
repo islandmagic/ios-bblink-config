@@ -11,6 +11,7 @@
 		042885162B74611200105FCB /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = 042885152B74611200105FCB /* Eureka */; };
 		043A103A2BBCD6C50075BD5D /* Bugsnag in Frameworks */ = {isa = PBXBuildFile; productRef = 043A10392BBCD6C50075BD5D /* Bugsnag */; };
 		043A103C2BBCD6C50075BD5D /* BugsnagNetworkRequestPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 043A103B2BBCD6C50075BD5D /* BugsnagNetworkRequestPlugin */; };
+		043A103F2BBF19A50075BD5D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 043A103E2BBF19A50075BD5D /* PrivacyInfo.xcprivacy */; };
 		0445DEAA2B74A4DB00E7D821 /* FirmwareUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0445DEA92B74A4DB00E7D821 /* FirmwareUpdater.swift */; };
 		048C20152B54D1650053BC7E /* ESPBDAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048C20142B54D1650053BC7E /* ESPBDAddress.swift */; };
 		04B5224B2B796F5700D87B5A /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04B5224A2B796F5700D87B5A /* Settings.bundle */; };
@@ -42,6 +43,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		043A103E2BBF19A50075BD5D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		0445DEA92B74A4DB00E7D821 /* FirmwareUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirmwareUpdater.swift; sourceTree = "<group>"; };
 		048C20142B54D1650053BC7E /* ESPBDAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPBDAddress.swift; sourceTree = "<group>"; };
 		048C201A2B565A770053BC7E /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/Main.xcstrings; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 		D5B24DCF1DEE393B00D33B5A = {
 			isa = PBXGroup;
 			children = (
+				043A103E2BBF19A50075BD5D /* PrivacyInfo.xcprivacy */,
 				04B5224A2B796F5700D87B5A /* Settings.bundle */,
 				D5B24DDA1DEE393B00D33B5A /* B.B. Link Configurator */,
 				D5B24DD91DEE393B00D33B5A /* Products */,
@@ -193,6 +196,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				043A103F2BBF19A50075BD5D /* PrivacyInfo.xcprivacy in Resources */,
 				D5B24DE61DEE393B00D33B5A /* LaunchScreen.storyboard in Resources */,
 				D480B12824033B8E008FDC62 /* Localizable.strings in Resources */,
 				04B5224B2B796F5700D87B5A /* Settings.bundle in Resources */,
@@ -424,7 +428,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7C6UBLMW45;
 				INFOPLIST_FILE = "$(SRCROOT)/$(PRODUCT_NAME)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "B.B. Link Configurator";
@@ -434,7 +438,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.islandmagic.bblink-config";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -447,7 +451,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7C6UBLMW45;
 				INFOPLIST_FILE = "$(SRCROOT)/$(PRODUCT_NAME)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "B.B. Link Configurator";
@@ -457,7 +461,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.islandmagic.bblink-config";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
