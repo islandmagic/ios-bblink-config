@@ -249,9 +249,12 @@ class BLECentralViewController: UIViewController, CBCentralManagerDelegate,
     print("bleSend")
     if let data = notification.object as? Data {
       print("sending: \((data.hexEncodedString() as String))")
-      blePeripheral!.writeValue(
-        data, for: txCharacteristic!,
-        type: CBCharacteristicWriteType.withoutResponse)
+      if blePeripheral != nil 
+      {
+        blePeripheral!.writeValue(
+          data, for: txCharacteristic!,
+          type: CBCharacteristicWriteType.withoutResponse)
+      }
     }
   }
 

@@ -173,7 +173,8 @@ class FirmwareUpdater: NSObject, CBPeripheralDelegate {
       peripheral.writeValue(chunk, for: characteristic, type: .withResponse)
 
       // Wait for the write to complete before writing the next chunk
-      while (progress?.isPaused ?? false) && !progress!.isCancelled {
+      while let progress = progress, progress.isPaused && !progress.isCancelled 
+      {
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.05))
       }
     }
