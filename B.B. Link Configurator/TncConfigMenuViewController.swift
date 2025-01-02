@@ -201,7 +201,12 @@ class TncConfigMenuViewController: FormViewController {
       +++ Section()
       <<< LabelRow { row in
         row.title = "Adapter Name"
-        row.value = peripheral?.name!
+        if peripheral?.name == nil
+        {
+            row.value = "nil"
+        } else {
+            row.value = peripheral?.name!
+        }
       }
       <<< LabelRow { row in
         row.tag = "firmwareVersionRowTag"
