@@ -61,7 +61,7 @@ class TncConfigMenuViewController: FormViewController {
     form
       +++ Section(
         footer:
-          "Before pairing, make your radio discoverable by selecting Menu > Configuration > Bluetooth > Pairing Mode (934). To pair with a different radio, reset the adapter to start over."
+          "Before pairing, make your radio discoverable by selecting Menu > Configuration > Bluetooth > Pairing Mode (934). To pair with a different radio, reset the adapter to start over.\n\nAfter pairing, ensure your radio is configured to use Bluetooth for KISS data, go to Menu > Configuration > Interface > KISS (983)."
       )
       <<< PushRow<BTDevice> { row in
         row.tag = "pairedRadioTag"
@@ -117,10 +117,25 @@ class TncConfigMenuViewController: FormViewController {
               title: "Confirm Pairing",
               message: "On the radio, press OK to confirm pairing.",
               preferredStyle: .alert)
+              
               alert.addAction(
-              UIAlertAction(
-                title: "Done", style: .default,
-                handler: nil))
+                UIAlertAction(
+                    title: "Done", style: .default,
+                    handler: { _ in
+                        let secondAlert = UIAlertController(
+                            title: "🎉 Congratulations",
+                            message: "You can now close this app.\nThe adapter only needs to be paired once and will automatically reconnect to your radio in the future.",
+                            preferredStyle: .alert
+                        )
+                        
+                        self?.present(secondAlert, animated: true) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
+                                secondAlert.dismiss(animated: true, completion: nil)
+                            }
+                        }
+                    }
+                )
+              )
               
               DispatchQueue.main.async {
                 self?.present(alert, animated: true)
@@ -220,6 +235,9 @@ class TncConfigMenuViewController: FormViewController {
       <<< ButtonRow { row in
         row.tag = "factoryResetTag"
         row.title = "Reset Adapter"
+      }.cellUpdate { cell, row in
+          // change color of title to red
+          cell.textLabel?.textColor = .red
       }.onCellSelection { [weak self] (cell, row) in
         let alert = UIAlertController(
           title: "Reset Adapter",
@@ -329,17 +347,7 @@ class TncConfigMenuViewController: FormViewController {
   }
 
   @objc func didLoseConnection(notification: NSNotification) {
-    let alert = UIAlertController(
-      title: "LostBLETitle".localized,
-      message: "LostBLEMessage".localized,
-      preferredStyle: .alert)
-    alert.addAction(
-      UIAlertAction(
-        title: "OK", style: .default,
-        handler: { action in
-          self.navigationController?.popToRootViewController(animated: false)
-        }))
-    self.present(alert, animated: true)
+    self.navigationController?.popToRootViewController(animated: false)
   }
 
   deinit {

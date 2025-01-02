@@ -120,21 +120,6 @@ class BLECentralViewController: UIViewController, CBCentralManagerDelegate,
      */
   func startScan() {
     peripherals = []
-    if let uuid = UserDefaults.standard.string(forKey: "last_peripheral_identifier") {
-      let identifier = UUID(uuidString: uuid)
-      if identifier != nil {
-        if let known = centralManager?.retrievePeripherals(withIdentifiers: [identifier!]) {
-          for p in known {
-            peripherals.append(p)
-            RSSIs.append(100)
-          }
-        }
-      }
-    }
-
-    if peripherals.count > 0 {
-      refreshScanView()
-    }
 
     print("Now Scanning...")
     self.timer.invalidate()
@@ -225,8 +210,6 @@ class BLECentralViewController: UIViewController, CBCentralManagerDelegate,
   func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
     print("Connection complete")
     print("Peripheral info: \(String(describing: peripheral))")
-    UserDefaults.standard.set(
-      peripheral.identifier.uuidString, forKey: "last_peripheral_identifier")
     //Stop Scan- We don't need to scan once we've connected to a peripheral. We got what we came for.
     centralManager?.stopScan()
     print("Scan Stopped")
@@ -494,18 +477,7 @@ class BLECentralViewController: UIViewController, CBCentralManagerDelegate,
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let device = peripherals[indexPath.row]
-    let alert = UIAlertController(
-      title: "ConnectAlertTitle".localized,
-      message: "ConnectAlertMessage".localized,
-      preferredStyle: .alert)
-    alert.addAction(
-      UIAlertAction(
-        title: "Connect".localized, style: .default,
-        handler: { action in
-          self.connectToDevice(device)
-        }))
-    alert.addAction(UIAlertAction(title: "Cancel".localized, style: .default, handler: nil))
-    self.present(alert, animated: true)
+    self.connectToDevice(device)
   }
 
   func unauthorized() {
