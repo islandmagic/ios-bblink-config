@@ -74,13 +74,13 @@
       }
     },
     "nnp-8d-jt4.text" : {
-      "comment" : "Class = \"UILabel\"; text = \"Version 1.0.5 (1)\"; ObjectID = \"nnp-8d-jt4\";",
+      "comment" : "Class = \"UILabel\"; text = \"Version 1.0.6 (0)\"; ObjectID = \"nnp-8d-jt4\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Version 1.0.5 (1)"
+            "value" : "Version 1.0.6 (0)"
           }
         }
       }

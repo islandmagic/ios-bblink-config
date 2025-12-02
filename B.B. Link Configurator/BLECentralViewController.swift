@@ -104,8 +104,11 @@ class BLECentralViewController: UIViewController, CBCentralManagerDelegate,
 
   override func viewDidAppear(_ animated: Bool) {
     disconnectFromDevice()
+    self.peripherals = []
+    self.RSSIs = []
+    self.baseTableView.reloadData()
     super.viewDidAppear(animated)
-    refreshScanView()
+    startScan()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
